@@ -5,6 +5,7 @@ wheel
 pandas
 numpy
 networkx
+scipy
 
 jupyter-dash
 dash-bootstrap-components
