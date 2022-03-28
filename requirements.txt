@@ -1,0 +1,10 @@
+dash
+plotly
+
+wheel
+pandas
+numpy
+networkx
+
+jupyter-dash
+dash-bootstrap-components
