@@ -9,7 +9,7 @@ def set_buckets(df, num_buckets=4):
     # set price ranges, dividing price ranges into equal number of assets.
     # Ignoring those without sales
     # Whole population of the collection
-    prices = df['last_sale_total_price']
+    prices = df[df['num_sales']>0]['last_sale_total_price'].tolist()
     q = [i / num_buckets for i in range(num_buckets + 1)]
     return np.nanquantile(prices, q)
 
