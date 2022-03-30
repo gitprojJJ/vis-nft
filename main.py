@@ -18,7 +18,8 @@ network_df, G, network_graph_pos = load_network_data(data_df)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-token_df_filtered = pd.DataFrame()
+current_filtered_df = data_df
+temp_filtered_df = current_filtered_df
 submit_n_click = 0
 figure_built = False
 price_colorbar = None
@@ -65,8 +66,23 @@ def show_pic(hoverData_price):
     #print(pt,bbox,num)
     return True, bbox, children, True, True, True, True
 
-def update_from_table(had_sales_check, price_min, price_max, selected_traits_list, sortby_list, sort_order, max_n_nfts,
-    price_bar_fig, tree_map_fig, attribute_fig, network_fig):
+def updateFigureFromDf(token_df_filtered, selected_traits_list):
+    price_bar_fig, price_colorbar = make_price_bar_fig(token_df_filtered)
+
+    tree_map_fig, owner_df_filtered = make_ownership_tree(token_df_filtered)
+
+    owner_list = owner_df_filtered['owner_address'].tolist()
+    network_fig = drawNetworkGraph(G, network_graph_pos, owner_list)
+    all_traits_list = token_df_filtered['traits_list_aslist'].sum()
+    if all_traits_list == 0:
+        time.sleep(0.25)
+        all_traits_list = token_df_filtered['traits_list_aslist'].sum()
+    traits_list = list(set(all_traits_list))
+    attribute_fig = price_range_graph(data_df, traits_list, num_buckets=4, interested_traits = selected_traits_list)
+    return price_bar_fig, price_colorbar, tree_map_fig, network_fig, attribute_fig, owner_df_filtered
+
+
+def update_from_table(had_sales_check, price_min, price_max, selected_traits_list, sortby_list, sort_order, max_n_nfts):
 
     price_min = max([price_min,0])
 
@@ -82,28 +98,7 @@ def update_from_table(had_sales_check, price_min, price_max, selected_traits_lis
 
     temp_data_df = data_df[price_cond & had_sales_cond & triats_cond].copy()
     temp_data_df = temp_data_df.sort_values(sortby_list, ascending = (sort_order == 'Ascending')).head(max_n_nfts)
-
-    global token_df_filtered
-    global owner_df_filtered
-    global price_colorbar
-
-    token_df_filtered = temp_data_df
-    price_bar_fig, price_colorbar = make_price_bar_fig(token_df_filtered)
-
-    tree_map_fig, owner_df_filtered = make_ownership_tree(token_df_filtered)
-
-    owner_list = owner_df_filtered['owner_address'].tolist()
-    network_fig = drawNetworkGraph(G, network_graph_pos, owner_list)
-    all_traits_list = token_df_filtered['traits_list_aslist'].sum()
-    if all_traits_list == 0:
-        time.sleep(0.25)
-        all_traits_list = token_df_filtered['traits_list_aslist'].sum()
-    traits_list = list(set(all_traits_list))
-    attribute_fig = price_range_graph(data_df, traits_list, num_buckets=4, interested_traits = selected_traits_list)
-
-    figure_built = True
-
-    return "Load Complete !", price_bar_fig, tree_map_fig, attribute_fig, network_fig  #, True
+    return temp_data_df;
 
 
 @app.callback(
@@ -119,6 +114,9 @@ def update_from_table(had_sales_check, price_min, price_max, selected_traits_lis
         Input("submit_button", "n_clicks"),
         Input('tree_map_fig', 'hoverData'),
         Input('attribute_fig', 'hoverData'),
+        Input('tree_map_fig', 'clickData'),
+        Input('attribute_fig', 'clickData'),
+        Input('price_bar_fig', 'clickData'),
     ],
     [
         State("had_sales_check", "value"),
@@ -137,39 +135,58 @@ def update_from_table(had_sales_check, price_min, price_max, selected_traits_lis
 )
 def make_hover_figures(
     n_clicks,
-    hoverData_tree, hoverData_attr,
+    hoverData_tree, hoverData_attr, clickData_tree, clickData_attr, clickData_price,
     had_sales_check, price_min, price_max, selected_traits_list, sortby_list, sort_order, max_n_nfts,
     price_bar_fig, tree_map_fig, attribute_fig, network_fig):
 
     #print(str(hoverData_attr),str(hoverData_tree))
     global figure_built
     global submit_n_click
+    global current_filtered_df
+    global temp_filtered_df
+
+    isClickEvent = clickData_tree is not None or clickData_attr is not None or clickData_price is not None
+    isHoverEvent = hoverData_tree is not None or hoverData_attr is not None
 
     if ((n_clicks != submit_n_click) | (not figure_built)  ):
         submit_n_click = n_clicks
-        return update_from_table(had_sales_check, price_min, price_max, selected_traits_list, sortby_list, sort_order, max_n_nfts,
-    price_bar_fig, tree_map_fig, attribute_fig, network_fig)
-    elif (hoverData_tree is not None) & (hoverData_attr is None):
-        #print(hoverData_tree)
-        updateBar = linkTreeChartToBarChart(
-            hoverData_tree,
-            price_colorbar,
-            price_bar_fig,
-            token_df_filtered,
-            owner_df_filtered)
-        return dash.no_update, updateBar, dash.no_update, dash.no_update, dash.no_update
-
-    elif (hoverData_attr is not None) & (hoverData_tree is None):
-        #print(hoverData_attr)
-        updateBar = linkAttrChartToBarChart(
-            hoverData_attr,
-            price_colorbar,
-            price_bar_fig,
-            token_df_filtered)
-        return dash.no_update, updateBar, dash.no_update, dash.no_update, dash.no_update
-
-    else:
+        current_filtered_df = update_from_table(had_sales_check, price_min, price_max, selected_traits_list, sortby_list, sort_order, max_n_nfts)
+        price_bar_fig, price_colorbar, tree_map_fig, network_fig, attribute_fig, owner_df_filtered = updateFigureFromDf(current_filtered_df, selected_traits_list)
+        figure_built = True
+        return "Load Complete !", price_bar_fig, tree_map_fig, attribute_fig, network_fig  #, True
+    elif isClickEvent:
+        # if clickData_tree is not None:
+        #     print(clickData_tree)
+        #     token_id = clickData_tree[0].label
+        #     print(token_id)
+        #     temp_filtered_df = current_filtered_df[current_filtered_df.name == token_id]
+        #     print(token_id)
+        # price_bar_fig, price_colorbar, tree_map_fig, network_fig, attribute_fig, owner_df_filtered= updateFigureFromDf(temp_filtered_df, selected_traits_list)
         return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+    elif isHoverEvent:
+        if (hoverData_tree is not None) & (hoverData_attr is None):
+            #print(hoverData_tree)
+            price_bar_fig, price_colorbar, tree_map_fig, network_fig, attribute_fig, owner_df_filtered= updateFigureFromDf(current_filtered_df, selected_traits_list)
+            updateBar = linkTreeChartToBarChart(
+                hoverData_tree,
+                price_colorbar,
+                price_bar_fig,
+                current_filtered_df,
+                owner_df_filtered)
+            return dash.no_update, updateBar, dash.no_update, dash.no_update, dash.no_update
+
+        elif (hoverData_attr is not None) & (hoverData_tree is None):
+            #print(hoverData_attr)
+            price_bar_fig, price_colorbar, tree_map_fig, network_fig, attribute_fig, owner_df_filtered = updateFigureFromDf(current_filtered_df, selected_traits_list)
+            updateBar = linkAttrChartToBarChart(
+                hoverData_attr,
+                price_colorbar,
+                price_bar_fig,
+                current_filtered_df)
+            return dash.no_update, updateBar, dash.no_update, dash.no_update, dash.no_update
+
+        else:
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
 @app.callback(
     Output("traits_checklist", "value"),
