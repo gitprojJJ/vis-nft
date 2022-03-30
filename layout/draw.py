@@ -111,6 +111,7 @@ def makeLayout(data_df, table_df, traits_list):
             ]),
             dcc.Tab(label='Charts', children=[
                 ###Col
+                html.Button('Reset',id='reset_button', n_clicks=0),
                 html.Div([
                     html.Div([
                         #dash.html.Label("Material 1"),
