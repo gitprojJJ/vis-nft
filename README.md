@@ -17,3 +17,6 @@ Everytime working on the project
 ```sh
 source .venv/bin/activate
 ```
+
+## Loading pickled data (for fast loading)
+Run [pickling.py](pickling.py) first to create pickled data. When there is pickled data, data_reader will use the pickled data.

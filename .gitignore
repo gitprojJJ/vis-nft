@@ -154,3 +154,4 @@ cython_debug/
 .venv
 
 data/*.csv
+data/*.p
