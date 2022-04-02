@@ -11,6 +11,21 @@ def make_price_bar_fig(df_dc):
     price_bar_fig = px.bar(bar_data, y='last_sale_total_price', x = 'name', color_discrete_sequence=[bar_color])
     return price_bar_fig, bar_color
 
+
+def make_price_strip_fig(df_dc):
+    
+    point_data = df_dc.sort_values('num_sales', ascending = False).head(50)
+    point_data.reset_index()
+
+    # print(df_dc.columns)
+    # point_data = df_dc
+
+    point_color = ['blue']
+    price_strip_fig = px.strip(point_data, y='last_sale_total_price', x='traits_count', color_discrete_sequence=point_color)
+
+    return price_strip_fig, point_color
+
+
 # Group some small amount address
 def make_ownership_tree(df_dc):
     tree_data = df_dc.groupby('owner_address').agg({'last_sale_total_price':'sum', 'id':'count'})
