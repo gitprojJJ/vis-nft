@@ -29,6 +29,7 @@ point_color = None
 last_clickData_price = None
 last_clickData_tree = None
 last_selectedData_price = None
+last_clickData_attr = None
 active_traits = None
 
 app = JupyterDash(__name__, external_stylesheets=external_stylesheets)
@@ -158,10 +159,11 @@ def make_hover_figures(
     global point_color
     global last_clickData_price
     global last_clickData_tree
+    global last_clickData_attr
     global last_selectedData_price
     global active_traits
 
-    isClickEvent = (last_clickData_tree != clickData_tree) or (last_clickData_price != clickData_price)
+    isClickEvent = (last_clickData_tree != clickData_tree) or (last_clickData_price != clickData_price) or (last_clickData_attr != clickData_attr)
     isSelectEvent = (last_selectedData_price != selectedData_price)
     isHoverEvent = hoverData_tree is not None or hoverData_attr is not None
     if (reset_clicks > reset_n_click):
@@ -196,6 +198,14 @@ def make_hover_figures(
             active_traits = temp_df_filtered['traits_list_aslist'].sum()
             price_strip_fig, point_color, tree_map_fig, network_fig, attribute_fig, owner_df_filtered = updateFigureFromDf(temp_df_filtered, active_traits)
             shouldUpdate = True
+        elif clickData_attr is not None and last_clickData_attr != clickData_attr:
+            last_clickData_attr = clickData_attr
+            clicked_trait = clickData_attr['points'][0]['customdata'][0]
+            active_traits = [clicked_trait]
+            condition = current_df_filtered["traits_list_aslist"].apply(lambda tl: clicked_trait in tl)
+            temp_df_filtered = current_df_filtered[condition]
+            price_strip_fig, point_color, tree_map_fig, network_fig, attribute_fig, owner_df_filtered = updateFigureFromDf(temp_df_filtered, active_traits)
+            shouldUpdate = True
         if (shouldUpdate):
             return dash.no_update, price_strip_fig, tree_map_fig, attribute_fig, network_fig  #, True
     elif isSelectEvent:
@@ -215,7 +225,7 @@ def make_hover_figures(
                 hoverData_tree,
                 point_color,
                 price_strip_fig,
-                current_df_filtered)
+                temp_df_filtered)
             return dash.no_update, updateStrip, dash.no_update, dash.no_update, dash.no_update
         elif (hoverData_attr is not None) & (hoverData_tree is None):
             #print(hoverData_attr)
@@ -223,7 +233,7 @@ def make_hover_figures(
                 hoverData_attr,
                 point_color,
                 price_strip_fig,
-                current_df_filtered)
+                temp_df_filtered)
             return dash.no_update, updateStrip, dash.no_update, dash.no_update, dash.no_update
     return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 

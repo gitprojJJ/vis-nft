@@ -35,7 +35,7 @@ def linkAttrChartToStripChart(hoverData, point_color, price_strip_fig, strip_dat
     # print(updateColor, len(updateColor), type(updateColor))
     if hoverData is not None and 'customdata' in hoverData['points'][0]:
         updateColor = copy.deepcopy(point_color)
-        hover_label = hoverData['points'][0]['customdata']
+        hover_label = hoverData['points'][0]['customdata'][0]
         # print(hover_label)
         tokens_contain_trait = strip_data['traits_list_aslist'].apply(lambda tr : hover_label in tr).tolist()
         # print(tokens_contain_trait )
