@@ -1,15 +1,5 @@
-
 import plotly.express as px
 import numpy as np
-
-# Select top 50 sales count in the bar chart
-def make_price_bar_fig(df_dc):
-    bar_data = df_dc.sort_values('num_sales', ascending = False).head(50)
-    bar_data.reset_index()
-
-    bar_color = np.full(len(bar_data), 'blue')
-    price_bar_fig = px.bar(bar_data, y='last_sale_total_price', x = 'name', color_discrete_sequence=[bar_color])
-    return price_bar_fig, bar_color
 
 # Group some small amount address
 def make_ownership_tree(df_dc):

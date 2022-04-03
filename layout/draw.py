@@ -115,7 +115,7 @@ def makeLayout(data_df, table_df, traits_list):
                 html.Div([
                     html.Div([
                         #dash.html.Label("Material 1"),
-                        dash.dcc.Graph(id='price_bar_fig', figure=None)
+                        dash.dcc.Graph(id='price_strip_fig', figure=None)
                     ],className="six columns"),
                     html.Div([
                         #dash.html.Label("Material 2"),
