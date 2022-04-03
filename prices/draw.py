@@ -1,6 +1,6 @@
 from turtle import fillcolor
 import plotly.graph_objects as go
-import pandas as pd
+import plotly.express as px
 import copy
 import numpy as np
 
@@ -11,47 +11,37 @@ def make_price_strip_fig(df_dc):
     # print(df_dc.columns)
     # point_data = df_dc
 
-    point_color = ['blue']
-    price_strip_fig = px.strip(point_data, y='last_sale_total_price', x='traits_count', color_discrete_sequence=point_color)
+    point_color = list(['blue'] * len(point_data))
+    price_strip_fig = px.strip(point_data, y='last_sale_total_price', x='traits_count', color=point_color, stripmode='overlay')
 
     return price_strip_fig, point_color
 
-def linkTreeChartToStripChart(hoverData, point_color, price_strip_fig, token_df_filtered, owner_df_filtered):
-
-    updateStrip = copy.deepcopy(price_strip_fig)
-    updateStrip = go.Figure(updateStrip)
+def linkTreeChartToStripChart(hoverData, point_color, price_strip_fig, token_df_filtered):
     updateColor = copy.deepcopy(point_color)
 
-    # point_data_owner_address = token_df_filtered['owner_address']
 
     if hoverData is not None and 'label' in hoverData['points'][0]:
-
         hover_label = hoverData['points'][0]['label']
-        hover_owner_address = owner_df_filtered.loc[(owner_df_filtered.owner_address_group == hover_label)]['owner_address']
-
-        # highlight_address = pd.Series(list(set(bar_data_owner_address) & set(hover_owner_address)), dtype = 'object')
-
-        updateColor[token_df_filtered['owner_address'].isin(hover_owner_address)] = 'red'
-        updateColor[(token_df_filtered.owner_address == hover_label)]='red'
-
-    updateStrip.update_traces(marker_color=updateColor)
+        point_data = token_df_filtered.sort_values('num_sales', ascending = False).head(50)
+        point_data.reset_index()
+        tokens_contain_owner = token_df_filtered['owner_address'].apply(lambda tr : hover_label in tr).tolist()
+        updateColor = ['red' if contain_trait else updateColor[i] for i,contain_trait in enumerate(tokens_contain_owner) ]
+        updateStrip = px.strip(point_data, y='last_sale_total_price', x='traits_count', color=updateColor, stripmode='overlay')
 
     return updateStrip
 
 def linkAttrChartToStripChart(hoverData, point_color, price_strip_fig, strip_data):
-    updateStrip = copy.deepcopy(price_strip_fig)
-    updateStrip = go.Figure(updateStrip)
-    updateColor = copy.deepcopy(point_color)
     # print(updateColor, len(updateColor), type(updateColor))
-
     if hoverData is not None and 'customdata' in hoverData['points'][0]:
-
+        updateStrip = copy.deepcopy(price_strip_fig)
+        updateStrip = go.Figure(updateStrip)
+        updateColor = copy.deepcopy(point_color)
         hover_label = hoverData['points'][0]['customdata']
         # print(hover_label)
         tokens_contain_trait = strip_data['traits_list_aslist'].apply(lambda tr : hover_label in tr).tolist()
         # print(tokens_contain_trait )
         updateColor = np.array(['green' if contain_trait else updateColor[i] for i,contain_trait in enumerate(tokens_contain_trait)])
         # print(updateColor)
-    updateStrip.update_traces(marker_color=updateColor)
+        updateStrip = px.strip(strip_data, y='last_sale_total_price', x='traits_count', color=updateColor, stripmode='overlay')
 
     return updateStrip

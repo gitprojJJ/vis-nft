@@ -194,8 +194,7 @@ def make_hover_figures(
                 hoverData_tree,
                 point_color,
                 price_strip_fig,
-                current_df_filtered,
-                current_owner_df_filtered)
+                current_df_filtered)
             return dash.no_update, updateStrip, dash.no_update, dash.no_update, dash.no_update
         elif (hoverData_attr is not None) & (hoverData_tree is None):
             #print(hoverData_attr)
