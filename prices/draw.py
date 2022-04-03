@@ -5,7 +5,7 @@ import copy
 import numpy as np
 
 def make_price_strip_fig(df_dc):
-    point_data = df_dc.sort_values('num_sales', ascending = False).head(50)
+    point_data = df_dc.sort_values('num_sales', ascending = False)
     point_data.reset_index()
 
     # print(df_dc.columns)
@@ -21,7 +21,7 @@ def linkTreeChartToStripChart(hoverData, point_color, price_strip_fig, token_df_
 
     if hoverData is not None and 'label' in hoverData['points'][0]:
         hover_label = hoverData['points'][0]['label']
-        point_data = token_df_filtered.sort_values('num_sales', ascending = False).head(50)
+        point_data = token_df_filtered.sort_values('num_sales', ascending = False)
         point_data.reset_index()
         tokens_contain_owner = token_df_filtered['owner_address'].apply(lambda tr : hover_label == tr).tolist()
         updateColor = ['red' if contain_trait else updateColor[i] for i,contain_trait in enumerate(tokens_contain_owner) ]
