@@ -1,4 +1,4 @@
-from turtle import update
+import math
 from traits.util import traits_stats
 import plotly.graph_objects as go
 
@@ -18,12 +18,17 @@ def price_range_graph(df, traits, num_buckets=4, interested_traits = []):
             x=price_tags,
             y=[1 - testing_stats[trait]['sale_prop']]+ [None] + testing_stats[trait]['freqs'],
             visible = visible,
-            customdata=[trait]*len(price_tags),
+            marker_size=math.sqrt(math.exp(-50 * testing_stats[trait]['rarity']) * 1000) + 10,
+            marker_line_width=testing_stats[trait]['rarity'] * 30 + 2,
+            marker_symbol=['diamond-open']*len(price_tags),
+            opacity=0.8,
             line_shape='spline',
+            customdata=[trait, testing_stats[trait]['rarity']]*len(price_tags),
             hovertemplate="<br>".join([
                 "Price: %{x}",
                 "Proportion: %{y}",
-                "Trait: %{customdata}",
+                "Trait: %{fullData.customdata[0]}",
+                "Rarity: %{fullData.customdata[1]}"
             ]))
         data.append(go_scatter)
     fig = go.Figure(data=data)
