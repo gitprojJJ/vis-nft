@@ -29,6 +29,7 @@ figure_built = False
 point_color = None
 last_clickData_price = None
 last_clickData_tree = None
+last_selectedData_price = None
 
 app = JupyterDash(__name__, external_stylesheets=external_stylesheets)
 
@@ -123,6 +124,7 @@ def update_from_table(had_sales_check, price_min, price_max, selected_traits_lis
         Input('tree_map_fig', 'clickData'),
         Input('attribute_fig', 'clickData'),
         Input('price_strip_fig', 'clickData'),
+        Input('price_strip_fig', 'selectedData'),
     ],
     [
         State("had_sales_check", "value"),
@@ -141,7 +143,7 @@ def update_from_table(had_sales_check, price_min, price_max, selected_traits_lis
 )
 def make_hover_figures(
     n_clicks, reset_clicks,
-    hoverData_tree, hoverData_attr, clickData_tree, clickData_attr, clickData_price,
+    hoverData_tree, hoverData_attr, clickData_tree, clickData_attr, clickData_price, selectedData_price,
     had_sales_check, price_min, price_max, selected_traits_list, sortby_list, sort_order, max_n_nfts,
     price_strip_fig, tree_map_fig, attribute_fig, network_fig):
 
@@ -155,8 +157,10 @@ def make_hover_figures(
     global point_color
     global last_clickData_price
     global last_clickData_tree
+    global last_selectedData_price
 
-    isClickEvent = clickData_tree is not None or clickData_price is not None
+    isClickEvent = (last_clickData_tree != clickData_tree) or (last_clickData_price != clickData_price)
+    isSelectEvent = (last_selectedData_price != selectedData_price)
     isHoverEvent = hoverData_tree is not None or hoverData_attr is not None
     if (reset_clicks > reset_n_click):
         reset_n_click = reset_clicks
@@ -184,6 +188,16 @@ def make_hover_figures(
             last_clickData_tree = clickData_tree
             owner_id = clickData_tree['points'][0]['label']
             temp_df_filtered = current_df_filtered[current_df_filtered.owner_address == owner_id]
+            price_strip_fig, point_color, tree_map_fig, network_fig, attribute_fig, owner_df_filtered = updateFigureFromDf(temp_df_filtered, selected_traits_list)
+            shouldUpdate = True
+        if (shouldUpdate):
+            return dash.no_update, price_strip_fig, tree_map_fig, attribute_fig, network_fig  #, True
+    elif isSelectEvent:
+        shouldUpdate = False
+        if selectedData_price is not None and last_selectedData_price != selectedData_price:
+            last_selectedData_price = selectedData_price
+            token_ids = [x['customdata'][0] for x in selectedData_price['points']]
+            temp_df_filtered = current_df_filtered[current_df_filtered['name'].isin(token_ids)]
             price_strip_fig, point_color, tree_map_fig, network_fig, attribute_fig, owner_df_filtered = updateFigureFromDf(temp_df_filtered, selected_traits_list)
             shouldUpdate = True
         if (shouldUpdate):
