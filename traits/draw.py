@@ -23,12 +23,12 @@ def price_range_graph(df, traits, num_buckets=4, interested_traits = []):
             marker_symbol=['diamond-open']*len(price_tags),
             opacity=0.8,
             line_shape='spline',
-            customdata=[trait, testing_stats[trait]['rarity']]*len(price_tags),
+            customdata=[[trait, testing_stats[trait]['rarity']]] * len(price_tags),
             hovertemplate="<br>".join([
                 "Price: %{x}",
                 "Proportion: %{y}",
-                "Trait: %{fullData.customdata[0]}",
-                "Rarity: %{fullData.customdata[1]}"
+                "Trait: %{customdata[0]}",
+                "Rarity: %{customdata[1]}"
             ]))
         data.append(go_scatter)
     fig = go.Figure(data=data)
