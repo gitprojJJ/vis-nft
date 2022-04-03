@@ -3,14 +3,13 @@ from jupyter_dash import JupyterDash
 import dash
 from dash import html
 from dash.dependencies import Input, Output, State
-import pandas as pd
 
 from data_reader import load_network_data, load_nft_data
 from layout.draw import makeLayout
 from network.draw import drawNetworkGraph
-# from prices.draw import linkTreeChartToBarChart, linkAttrChartToBarChart
-from scatter.draw import linkTreeChartToStripChart, linkAttrChartToStripChart 
-from ownership.draw import make_ownership_tree, make_price_strip_fig
+from prices.draw import linkTreeChartToStripChart, linkAttrChartToStripChart
+from ownership.draw import make_ownership_tree
+from prices.draw import make_price_strip_fig
 from traits.draw import price_range_graph
 
 #ABC20220402
