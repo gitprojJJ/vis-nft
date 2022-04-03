@@ -176,7 +176,7 @@ def make_hover_figures(
         shouldUpdate = False
         if clickData_price is not None and last_clickData_price != clickData_price:
             last_clickData_price = clickData_price
-            token_id = clickData_price['points'][0]['label']
+            token_id = clickData_price['points'][0]['customdata'][0]
             temp_df_filtered = current_df_filtered[current_df_filtered.name == token_id]
             price_strip_fig, point_color, tree_map_fig, network_fig, attribute_fig, owner_df_filtered = updateFigureFromDf(temp_df_filtered, selected_traits_list)
             shouldUpdate = True
