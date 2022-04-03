@@ -12,13 +12,12 @@ def make_price_strip_fig(df_dc):
     # point_data = df_dc
 
     point_color = list(['blue'] * len(point_data))
-    price_strip_fig = px.strip(point_data, y='last_sale_total_price', x='num_sales', color=point_color, stripmode='overlay')
+    price_strip_fig = px.strip(point_data, y='last_sale_total_price', x='num_sales', color=point_color, stripmode='overlay', custom_data=['name'])
 
     return price_strip_fig, point_color
 
 def linkTreeChartToStripChart(hoverData, point_color, price_strip_fig, token_df_filtered):
     updateColor = copy.deepcopy(point_color)
-
 
     if hoverData is not None and 'label' in hoverData['points'][0]:
         hover_label = hoverData['points'][0]['label']
@@ -26,15 +25,15 @@ def linkTreeChartToStripChart(hoverData, point_color, price_strip_fig, token_df_
         point_data.reset_index()
         tokens_contain_owner = token_df_filtered['owner_address'].apply(lambda tr : hover_label in tr).tolist()
         updateColor = ['red' if contain_trait else updateColor[i] for i,contain_trait in enumerate(tokens_contain_owner) ]
-        updateStrip = px.strip(point_data, y='last_sale_total_price', x='num_sales', color=updateColor, stripmode='overlay')
-
+        updateStrip = px.strip(point_data, y='last_sale_total_price', x='num_sales', color=updateColor, stripmode='overlay', custom_data=['name'])
+    else:
+        updateStrip = copy.deepcopy(price_strip_fig)
+        updateStrip = go.Figure(updateStrip)
     return updateStrip
 
 def linkAttrChartToStripChart(hoverData, point_color, price_strip_fig, strip_data):
     # print(updateColor, len(updateColor), type(updateColor))
     if hoverData is not None and 'customdata' in hoverData['points'][0]:
-        updateStrip = copy.deepcopy(price_strip_fig)
-        updateStrip = go.Figure(updateStrip)
         updateColor = copy.deepcopy(point_color)
         hover_label = hoverData['points'][0]['customdata']
         # print(hover_label)
@@ -42,6 +41,8 @@ def linkAttrChartToStripChart(hoverData, point_color, price_strip_fig, strip_dat
         # print(tokens_contain_trait )
         updateColor = np.array(['green' if contain_trait else updateColor[i] for i,contain_trait in enumerate(tokens_contain_trait)])
         # print(updateColor)
-        updateStrip = px.strip(strip_data, y='last_sale_total_price', x='num_sales', color=updateColor, stripmode='overlay')
-
+        updateStrip = px.strip(strip_data, y='last_sale_total_price', x='num_sales', color=updateColor, stripmode='overlay', custom_data=['name'])
+    else:
+        updateStrip = copy.deepcopy(price_strip_fig)
+        updateStrip = go.Figure(updateStrip)
     return updateStrip
