@@ -9,3 +9,5 @@ scipy
 
 jupyter-dash
 dash-bootstrap-components
+
+pydenticon

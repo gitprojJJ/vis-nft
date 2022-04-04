@@ -7,7 +7,7 @@ def makeLayout(data_df, table_df, traits_list):
     dash_table_cols = []
     for col in table_df.columns:
         col_dict = {"name": col, "id": col, "deletable": False, "selectable": False, }
-        if col in ['img_md','traits_list_list']:
+        if col in ['img_md','traits_list_list', 'owner_img_md']:
             col_dict['presentation'] = "markdown"
         dash_table_cols.append(col_dict)
 
