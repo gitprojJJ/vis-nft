@@ -4,6 +4,9 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 
+from identicon.identicon import address_to_md
+
+
 g_path = "./data"
 
 def set_buckets(df, num_buckets=4):
@@ -65,6 +68,7 @@ def load_nft_data():
         data_df['last_sale_total_price'] = data_df['last_sale_total_price'].fillna(0)
         data_df['traits_list'] = data_df['traits_list'].fillna('NoTrait')
         data_df['img_md'] = data_df['image_url'].apply(lambda url : f"<img src='{url}' height='30' />")
+        data_df['owner_img_md'] = data_df['owner_address'].apply(lambda address: address_to_md(address))
 
         prices_quantile = set_buckets(data_df, num_buckets=4)
         assign_price_buckets(data_df, prices_quantile)
@@ -77,7 +81,7 @@ def load_nft_data():
         traits_list = make_trait_list(data_df, traits_set, prices_quantile)
 
         table_df = data_df[['img_md','id','num_sales',
-                            'last_sale_total_price','name','owner_address',
+                            'last_sale_total_price','name','owner_address', 'owner_img_md',
                             'traits_sex','traits_count','traits_list']].copy()
         table_df['traits_list'] = data_df['traits_list_aslist'].apply(lambda tl : (" , ").join(tl))
     return data_df, table_df, traits_list
