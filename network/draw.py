@@ -3,9 +3,9 @@ import networkx as nx
 import plotly.graph_objects as go
 from network.arrow import addEdge
 
-def drawNetworkGraph(G, graph_pos, addresses = None):
+def drawNetworkGraph(G, graph_pos, addresses = [], df = None):
     isSubGraph = addresses and len(addresses)
-    if isSubGraph: 
+    if isSubGraph:
         bfs_edges = iter(())
         for address in addresses:
             bfs_edges = chain(bfs_edges, nx.bfs_edges(G, address, reverse=True, depth_limit=1))
@@ -104,4 +104,29 @@ def drawNetworkGraph(G, graph_pos, addresses = None):
         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
         )
+
+    for node in graph.nodes():
+        img_df = df[df['owner_address'] == node]['owner_img_md']
+        if not img_df.empty:
+            x, y = graph_pos[node]
+            src = img_df.iloc[0]
+            src = src[len("<img src='"):]
+            src = src[:-len("'/>")]
+            fig.add_layout_image(
+                dict(
+                    source=src,
+                    xref="x",
+                    yref="y",
+                    xanchor="center",
+                    yanchor="middle",
+                    x=x,
+                    y=y,
+                    sizex=0.01,
+                    sizey=0.01,
+                    sizing="contain",
+                    opacity=1,
+                    layer="above"
+                )
+            )
+
     return fig

@@ -81,7 +81,7 @@ def updateFigureFromDf(token_df_filtered, active_traits):
     tree_map_fig, owner_df_filtered = make_ownership_tree(token_df_filtered)
 
     owner_list = owner_df_filtered['owner_address'].tolist()
-    network_fig = drawNetworkGraph(G, network_graph_pos, owner_list)
+    network_fig = drawNetworkGraph(G, network_graph_pos, owner_list, token_df_filtered)
     all_traits_list = token_df_filtered['traits_list_aslist'].sum()
     if all_traits_list == 0:
         time.sleep(0.25)
