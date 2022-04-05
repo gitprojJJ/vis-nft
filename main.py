@@ -4,7 +4,7 @@ import dash
 from dash import html
 from dash.dependencies import Input, Output, State
 
-from data_reader import load_network_data, load_nft_data
+from data_reader import load_network_data, load_nft_data, get_traits_color_dict
 from layout.draw import makeLayout
 from network.draw import drawNetworkGraph
 from prices.draw import linkTreeChartToStripChart, linkAttrChartToStripChart
@@ -13,6 +13,7 @@ from prices.draw import make_price_strip_fig
 from traits.draw import price_range_graph
 
 data_df, table_df, traits_list = load_nft_data()
+traits_colors_dict = get_traits_color_dict(traits_list)
 network_df, G, network_graph_pos = load_network_data(data_df)
 
 
@@ -87,7 +88,7 @@ def updateFigureFromDf(token_df_filtered, active_traits):
         time.sleep(0.25)
         all_traits_list = token_df_filtered['traits_list_aslist'].sum()
     traits_list = list(set(all_traits_list))
-    attribute_fig = price_range_graph(data_df, traits_list, num_buckets=4, interested_traits=active_traits)
+    attribute_fig = price_range_graph(data_df, traits_list, num_buckets=4, interested_traits=active_traits, traits_colors_dict = traits_colors_dict)
     return price_strip_fig, point_color, tree_map_fig, network_fig, attribute_fig, owner_df_filtered
 
 

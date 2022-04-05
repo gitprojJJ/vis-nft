@@ -3,6 +3,7 @@ import pickle
 import pandas as pd
 import numpy as np
 import networkx as nx
+from plotly import colors as plotly_colors
 
 from identicon.identicon import address_to_md
 
@@ -50,6 +51,11 @@ def make_trait_list(data_df, traits_set, prices_quantile):
   traits_list = traits_df['trait'].tolist()
   return traits_list
 
+def get_traits_color_dict(traits_full_list):
+    color_list = plotly_colors.DEFAULT_PLOTLY_COLORS
+    n_colors = len(color_list)
+    traits_color_dict = {trait : color_list[i % n_colors] for i, trait in enumerate(traits_full_list)}
+    return traits_color_dict
 
 def load_nft_data():
     data_df_p = os.path.join(g_path, "data_df.p")
