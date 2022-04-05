@@ -66,11 +66,11 @@ def show_pic(hoverData_price):
     children = [
         html.Div([
             html.Img(src=img_src, style={"width": "100%"}),
-            html.H2(f"{nft_name}", style={"color": "darkblue"}),
-            html.P(f"{', '.join(traits)}"),
-            html.P(f"price : {price:.4g}"),
-            html.P(f"number of sales : {num_sales}"),
-        ], style={'width': '200px', 'white-space': 'normal'})
+            html.P(f"{nft_name}", style={"color": "darkblue",'fontSize': 11}),
+            html.P(f"{', '.join(traits)}", style = {'fontSize': 8}),
+            html.P(f"price : {price:.4g}", style = {'fontSize': 8}),
+            html.P(f"number of sales : {num_sales}", style = {'fontSize': 8}),
+        ], style={'width': '100px', 'white-space': 'normal'})
     ]
     #print(pt,bbox,num)
     return True, bbox, children, True, True, True, True
