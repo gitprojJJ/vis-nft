@@ -9,7 +9,9 @@ def drawNetworkGraph(G, graph_pos, addresses = [], df = None):
         bfs_edges = iter(())
         for address in addresses:
             bfs_edges = chain(bfs_edges, nx.bfs_edges(G, address, reverse=True, depth_limit=1))
-        graph = G.edge_subgraph(bfs_edges)
+        graph = nx.Graph(G.edge_subgraph(bfs_edges))
+        for address in addresses:
+            graph.add_node(address)
     else:
         graph = G
     edge_x = []
@@ -59,7 +61,7 @@ def drawNetworkGraph(G, graph_pos, addresses = [], df = None):
     highlight_node_x = []
     highlight_node_y = []
 
-    if isSubGraph: 
+    if isSubGraph:
         for node in addresses:
             x, y = graph_pos[node]
             highlight_node_x.append(x)
