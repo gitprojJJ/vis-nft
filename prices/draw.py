@@ -23,8 +23,8 @@ def linkTreeChartToStripChart(hoverData, point_color, price_strip_fig, token_df_
         hover_label = hoverData['points'][0]['label']
         point_data = token_df_filtered.sort_values('num_sales', ascending = False)
         point_data.reset_index()
-        tokens_contain_owner = token_df_filtered['owner_address'].apply(lambda tr : hover_label == tr).tolist()
-        updateColor = ['red' if contain_trait else updateColor[i] for i,contain_trait in enumerate(tokens_contain_owner) ]
+        tokens_contain_owner = (point_data['owner_address'] == hover_label).tolist()
+        updateColor = ['red' if owner else 'blue' for owner in tokens_contain_owner]
         updateStrip = px.strip(point_data, y='last_sale_total_price', x='num_sales', color=updateColor, stripmode='overlay', custom_data=['name'])
     else:
         updateStrip = copy.deepcopy(price_strip_fig)
