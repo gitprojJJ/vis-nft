@@ -3,8 +3,8 @@ import os
 
 from data_reader import load_network_data, load_nft_data
 
-data_df, table_df, traits_list = load_nft_data()
-network_df, G, network_graph_pos = load_network_data(data_df)
+data_df, table_df, traits_list = load_nft_data(force=True)
+network_df, G, network_graph_pos = load_network_data(data_df, force=True)
 
 outpath = "data"
 

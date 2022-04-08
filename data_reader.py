@@ -57,11 +57,11 @@ def get_traits_color_dict(traits_full_list):
     traits_color_dict = {trait : color_list[i % n_colors] for i, trait in enumerate(traits_full_list)}
     return traits_color_dict
 
-def load_nft_data():
+def load_nft_data(force=False):
     data_df_p = os.path.join(g_path, "data_df.p")
     table_df_p = os.path.join(g_path, "table.p")
     traits_list_p = os.path.join(g_path, "traits_list.p")
-    if os.path.exists(data_df_p) and \
+    if not force and os.path.exists(data_df_p) and \
         os.path.exists(table_df_p) and \
         os.path.exists(traits_list_p):
             data_df = pickle.load(open(data_df_p, "rb"))
@@ -92,11 +92,11 @@ def load_nft_data():
         table_df['traits_list'] = data_df['traits_list_aslist'].apply(lambda tl : (" , ").join(tl))
     return data_df, table_df, traits_list
 
-def load_network_data(data_df):
+def load_network_data(data_df, force=False):
     network_df_p = os.path.join(g_path, "network_df.p")
     g_p = os.path.join(g_path, "G.p")
     network_graph_pos_p = os.path.join(g_path, "network_graph_pos.p")
-    if os.path.exists(network_df_p) and \
+    if not force and os.path.exists(network_df_p) and \
         os.path.exists(g_p) and \
         os.path.exists(network_graph_pos_p):
             network_df = pickle.load(open(network_df_p, "rb"))
