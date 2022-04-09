@@ -177,6 +177,8 @@ def make_hover_figures(
     elif ((n_clicks > submit_n_click) or (not figure_built)  ):
         active_traits = [trait for trait in selected_traits_list]
         submit_n_click = n_clicks
+        if selected_traits_list == []:
+            return "Please select at least one traits and press submit again.", dash.no_update, dash.no_update, dash.no_update,dash.no_update 
         current_df_filtered = update_from_table(had_sales_check, price_min, price_max, selected_traits_list, sortby_list, sort_order, max_n_nfts)
         temp_df_filtered = current_df_filtered
         price_strip_fig, point_color, tree_map_fig, network_fig, attribute_fig, owner_df_filtered = updateFigureFromDf(current_df_filtered, active_traits)

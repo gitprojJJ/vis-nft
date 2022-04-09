@@ -91,11 +91,12 @@ def makeLayout(data_df, table_df, traits_list):
                         value = 'Descending'
                     ),
                     html.Br(),
-                    'Maximum number to NFTs  :    ',
-                    dcc.Slider(
-                        min=1, 
-                        max=30, step=1, value=28, 
-                        id='max_n_nfts'
+                    'Maximum number of NFTs  :    ',
+                    dcc.Input(
+                        type="number",
+                        placeholder="Number of Data Points",
+                        value = 500 , # len(data_df),
+                        id='max_n_nfts',
                     ),
                     html.Br(),
                     dbc.Button(
