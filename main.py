@@ -41,6 +41,7 @@ app.layout = makeLayout(data_df, table_df, traits_list)
         Output("picture_tooltip", "show"),
         Output("picture_tooltip", "bbox"),
         Output("picture_tooltip", "children"),
+        Output("picture_tooltip", "direction"),
         Output("price_strip_fig", "clear_on_unhover"),
         Output("tree_map_fig", "clear_on_unhover"),
         Output('attribute_fig', 'clear_on_unhover'),
@@ -48,33 +49,92 @@ app.layout = makeLayout(data_df, table_df, traits_list)
     ],
     [
         Input('price_strip_fig', 'hoverData'),
+        Input('tree_map_fig', 'hoverData'),
+        Input('network_fig', 'hoverData'),
     ],
 )
-def show_pic(hoverData_price):
-    if hoverData_price is None:
-        return False, dash.no_update, dash.no_update, True, True, True, True
-    pt = hoverData_price["points"][0]
-    bbox = pt["bbox"]
-    nft_name = pt["customdata"][0]
+def show_pic(hoverData_price, hoverData_treemap, hoverData_network):
+    hoverDatas = [hoverData_price, hoverData_treemap, hoverData_network]
+    all_None = all([hoverData is None for hoverData in hoverDatas])
+    if all_None:
+        return False, dash.no_update, dash.no_update, dash.no_update, True, True, True, True
+    if hoverData_price is not None :
+        pt = hoverData_price["points"][0]
+        bbox = pt["bbox"]
+        nft_name = pt["customdata"][0]
 
-    df_row = data_df[data_df['name'] == nft_name].iloc[0]
-    img_src = df_row['image_url']
-    traits = df_row['traits_list_aslist']
-    price = df_row['last_sale_total_price']
-    num_sales = df_row['num_sales']
+        df_row = data_df[data_df['name'] == nft_name].iloc[0]
+        img_src = df_row['image_url']
+        traits = df_row['traits_list_aslist']
+        price = df_row['last_sale_total_price']
+        num_sales = df_row['num_sales']
 
-    children = [
-        html.Div([
-            html.Img(src=img_src, style={"width": "100%"}),
-            html.P(f"{nft_name}", style={"color": "darkblue",'fontSize': 11}),
-            html.P(f"{', '.join(traits)}", style = {'fontSize': 8}),
-            html.P(f"price : {price:.4g}", style = {'fontSize': 8}),
-            html.P(f"number of sales : {num_sales}", style = {'fontSize': 8}),
-        ], style={'width': '100px', 'whiteSpace': 'normal'})
-    ]
-    #print(pt,bbox,num)
-    return True, bbox, children, True, True, True, True
+        children = [
+            html.Div([
+                html.Img(src=img_src, style={"width": "100%"}),
+                html.P(f"{nft_name}", style={"color": "darkblue",'fontSize': 11}),
+                html.P(f"{', '.join(traits)}", style = {'fontSize': 8}),
+                html.P(f"price : {price:.4g}", style = {'fontSize': 8}),
+                html.P(f"number of sales : {num_sales}", style = {'fontSize': 8}),
+            ], style={'width': '100px', 'whiteSpace': 'normal'})
+        ]
+        #print(pt,bbox,num)
+        return True, bbox, children, 'right', True, True, True, True
+    elif hoverData_treemap is not None :
+        pt = hoverData_treemap["points"][0]
+        bbox = pt["bbox"]
+        if ('label' in list(pt.keys())) :
+            if (len(pt['label'])>30):
+                
+                img_df = data_df[data_df['owner_address'] == pt['label']]['owner_img_md']
+                src = img_df.iloc[0]
+                src = src[len("<img src='"):]
+                src = src[:-len("'/>")]
 
+                children = [
+                    html.Div([
+                        html.P(f"Owner (identicon)", style={"color": "darkblue",'fontSize': 11}),
+                        html.Img(src=src, style={"width": "100%"}),
+                        html.P(f"Owner collection value : {pt['value']}", style = {'fontSize': 8}),
+                    ], style={'width': '100px', 'whiteSpace': 'normal'})
+                ]
+
+                return True, bbox, children, 'left', True, True, True, True
+            else: 
+                return False, dash.no_update, dash.no_update, dash.no_update, True, True, True, True
+        else: 
+            return False, dash.no_update, dash.no_update, dash.no_update, True, True, True, True
+    elif hoverData_network is not None :
+        pt = hoverData_network["points"][0]
+        bbox = pt["bbox"]
+        if ('text' in list(pt.keys())) :
+            if "# of connections: " in pt['text']:
+                owner_id, n_connections = pt['text'].split("# of connections: ")
+                n_connections = int(n_connections)
+                if (len(owner_id) >30) & data_df['owner_address'].str.contains(owner_id).any():
+                    
+                    img_df = data_df[data_df['owner_address'].str.contains(owner_id)]['owner_img_md']
+                    src = img_df.iloc[0]
+                    src = src[len("<img src='"):]
+                    src = src[:-len("'/>")]
+
+                    children = [
+                        html.Div([
+                            html.P(f"Owner (identicon)", style={"color": "darkblue",'fontSize': 11}),
+                            html.Img(src=src, style={"width": "100%"}),
+                            html.P(f"# of connections : {n_connections}", style = {'fontSize': 8}),
+                        ], style={'width': '100px', 'whiteSpace': 'normal'})
+                    ]
+
+                    return True, bbox, children, 'left', True, True, True, True
+                else: 
+                    return False, dash.no_update, dash.no_update, dash.no_update, True, True, True, True
+            else: 
+                return False, dash.no_update, dash.no_update, dash.no_update, True, True, True, True
+        else: 
+            return False, dash.no_update, dash.no_update, dash.no_update, True, True, True, True
+    else: 
+        return False, dash.no_update, dash.no_update, dash.no_update, True, True, True, True
 
 def updateFigureFromDf(token_df_filtered, active_traits):
     price_strip_fig, point_color = make_price_strip_fig(token_df_filtered)

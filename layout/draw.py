@@ -95,7 +95,7 @@ def makeLayout(data_df, table_df, traits_list):
                     dcc.Input(
                         type="number",
                         placeholder="Number of Data Points",
-                        value = 500 , # len(data_df),
+                        value = 100 , # len(data_df),
                         id='max_n_nfts',
                     ),
                     html.Br(),
