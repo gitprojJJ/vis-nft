@@ -39,7 +39,7 @@ def drawNetworkGraph(G, graph_pos, addresses = [], df = None):
         mode='markers',
         hoverinfo='text',
         marker=dict(
-            showscale=True,
+            showscale=False,  # set true to enable color scale of node
             # colorscale options
             #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
             #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
@@ -72,6 +72,7 @@ def drawNetworkGraph(G, graph_pos, addresses = [], df = None):
         mode='markers',
         hoverinfo='text',
         marker=dict(
+            showscale=False,  # set true to enable color scale of node
             color='red',
             size=10,
             colorbar=dict(

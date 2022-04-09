@@ -13,6 +13,8 @@ def make_price_strip_fig(df_dc):
 
     point_color = list(['blue'] * len(point_data))
     price_strip_fig = px.strip(point_data, y='last_sale_total_price', x='num_sales', color=point_color, stripmode='overlay', custom_data=['name'])
+    price_strip_fig.update_layout(showlegend=False)
+    price_strip_fig.update_traces(hovertemplate="<extra></extra>")
 
     return price_strip_fig, point_color
 
@@ -26,6 +28,8 @@ def linkTreeChartToStripChart(hoverData, point_color, price_strip_fig, token_df_
         tokens_contain_owner = (point_data['owner_address'] == hover_label).tolist()
         updateColor = ['red' if owner else 'blue' for owner in tokens_contain_owner]
         updateStrip = px.strip(point_data, y='last_sale_total_price', x='num_sales', color=updateColor, stripmode='overlay', custom_data=['name'])
+        updateStrip.update_layout(showlegend=False)
+        updateStrip.update_traces(hovertemplate="<extra></extra>")
     else:
         updateStrip = copy.deepcopy(price_strip_fig)
         updateStrip = go.Figure(updateStrip)
@@ -42,6 +46,8 @@ def linkAttrChartToStripChart(hoverData, point_color, price_strip_fig, strip_dat
         updateColor = np.array(['green' if contain_trait else updateColor[i] for i,contain_trait in enumerate(tokens_contain_trait)])
         # print(updateColor)
         updateStrip = px.strip(strip_data, y='last_sale_total_price', x='num_sales', color=updateColor, stripmode='overlay', custom_data=['name'])
+        updateStrip.update_layout(showlegend=False)
+        updateStrip.update_traces(hovertemplate="<extra></extra>")
     else:
         updateStrip = copy.deepcopy(price_strip_fig)
         updateStrip = go.Figure(updateStrip)

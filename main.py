@@ -70,7 +70,7 @@ def show_pic(hoverData_price):
             html.P(f"{', '.join(traits)}", style = {'fontSize': 8}),
             html.P(f"price : {price:.4g}", style = {'fontSize': 8}),
             html.P(f"number of sales : {num_sales}", style = {'fontSize': 8}),
-        ], style={'width': '100px', 'white-space': 'normal'})
+        ], style={'width': '100px', 'whiteSpace': 'normal'})
     ]
     #print(pt,bbox,num)
     return True, bbox, children, True, True, True, True

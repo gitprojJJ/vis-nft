@@ -34,7 +34,8 @@ def price_range_graph(df, traits, num_buckets=4, interested_traits = [], traits_
                 "Price: %{x}",
                 "Proportion: %{y}",
                 "Trait: %{customdata[0]}",
-                "Rarity: %{customdata[1]}"
+                "Rarity: %{customdata[1]}",
+                "<extra></extra>"
             ]))
         data.append(go_scatter)
     fig = go.Figure(data=data)
